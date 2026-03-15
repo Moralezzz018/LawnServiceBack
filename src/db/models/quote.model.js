@@ -31,6 +31,11 @@ const Quote = sequelize.define(
       allowNull: false,
       defaultValue: [],
     },
+    lineItems: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
     estimatedAmount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,

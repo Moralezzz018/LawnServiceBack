@@ -1,14 +1,47 @@
 const { Quote } = require('../../db/models');
 
+let quoteSchemaReady = false;
+
+async function ensureQuoteSchema() {
+  if (quoteSchemaReady) return;
+  await Quote.sync({ alter: true });
+  quoteSchemaReady = true;
+}
+
+function sanitizeLineItems(items = []) {
+  return items.map((item) => {
+    const unitPrice = Number(item.unitPrice || 0);
+    const quantity = Number(item.quantity || 0);
+    const subtotal = Number((unitPrice * quantity).toFixed(2));
+
+    return {
+      serviceId: Number(item.serviceId),
+      serviceName: String(item.serviceName),
+      unit: String(item.unit),
+      unitPrice,
+      quantity,
+      subtotal,
+    };
+  });
+}
+
 async function createQuote(req, res, next) {
   try {
+    await ensureQuoteSchema();
+
+    const lineItems = sanitizeLineItems(req.body.lineItems || []);
+    const estimatedAmount = Number(
+      lineItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0).toFixed(2)
+    );
+
     const data = {
       clientFullName: req.body.clientFullName,
       phone: req.body.phone || null,
       email: req.body.email || null,
       serviceAddress: req.body.serviceAddress || null,
-      serviceTypes: req.body.serviceTypes,
-      estimatedAmount: req.body.estimatedAmount || null,
+      serviceTypes: lineItems.map((item) => item.serviceName),
+      lineItems,
+      estimatedAmount,
       currency: req.body.currency || 'USD',
       status: req.body.status || 'DRAFT',
       notes: req.body.notes || null,
@@ -28,6 +61,8 @@ async function createQuote(req, res, next) {
 
 async function listQuotes(req, res, next) {
   try {
+    await ensureQuoteSchema();
+
     const quotes = await Quote.findAll({
       order: [['createdAt', 'DESC']],
     });
