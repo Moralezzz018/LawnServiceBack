@@ -17,9 +17,24 @@ async function createAppointment(req, res, next) {
 
     const appointment = await Appointment.create(payload);
 
-    await sendAppointmentNotification({
+    console.log('[APPOINTMENT] Created', {
+      id: appointment.id,
+      email: appointment.email,
+      createdAt: appointment.createdAt,
+    });
+
+    const emailResult = await sendAppointmentNotification({
       ...payload,
+      appointmentId: appointment.id,
       preferredDateTime: payload.preferredDateTime.toISOString(),
+    });
+
+    console.log('[APPOINTMENT] Email flow result', {
+      id: appointment.id,
+      emailStatus: emailResult?.status,
+      provider: emailResult?.provider,
+      messageId: emailResult?.messageId || null,
+      error: emailResult?.error || null,
     });
 
     return res.status(201).json({
