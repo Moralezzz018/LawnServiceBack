@@ -5,12 +5,24 @@ const toBoolean = (value, fallback = false) => {
   return String(value).toLowerCase() === 'true';
 };
 
+const toArray = (value, fallback = []) => {
+  if (!value) return fallback;
+  return String(value)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const corsOrigins = toArray(process.env.CORS_ORIGIN, ['http://localhost:5173']);
+
 module.exports = {
   port: Number(process.env.PORT || 4000),
   nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  corsOrigins,
 
   db: {
+    url: process.env.DATABASE_URL || '',
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || 5432),
     name: process.env.DB_NAME || 'lawn_service',
@@ -18,6 +30,8 @@ module.exports = {
     password: process.env.DB_PASSWORD || 'postgres',
     logging: toBoolean(process.env.DB_LOGGING, false),
     sync: toBoolean(process.env.DB_SYNC, false),
+    ssl: toBoolean(process.env.DB_SSL, false),
+    sslRejectUnauthorized: toBoolean(process.env.DB_SSL_REJECT_UNAUTHORIZED, true),
   },
 
   jwt: {
