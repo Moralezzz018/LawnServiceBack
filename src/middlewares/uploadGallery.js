@@ -3,10 +3,32 @@ const path = require('path');
 const multer = require('multer');
 const env = require('../config/env');
 
-const destination = path.resolve(process.cwd(), env.uploadDir, 'gallery');
+const configuredBaseDir = path.isAbsolute(env.uploadDir)
+  ? env.uploadDir
+  : path.resolve(process.cwd(), env.uploadDir);
 
-if (!fs.existsSync(destination)) {
-  fs.mkdirSync(destination, { recursive: true });
+const configuredDestination = path.resolve(configuredBaseDir, 'gallery');
+
+let destination = configuredDestination;
+
+try {
+  if (!fs.existsSync(destination)) {
+    fs.mkdirSync(destination, { recursive: true });
+  }
+} catch (error) {
+  if (error.code !== 'EACCES' && error.code !== 'EPERM') {
+    throw error;
+  }
+
+  destination = path.resolve(process.cwd(), 'uploads', 'gallery');
+
+  if (!fs.existsSync(destination)) {
+    fs.mkdirSync(destination, { recursive: true });
+  }
+
+  console.warn(
+    `[UPLOAD_GALLERY] No write permission for "${configuredDestination}". Falling back to "${destination}".`
+  );
 }
 
 const storage = multer.diskStorage({
