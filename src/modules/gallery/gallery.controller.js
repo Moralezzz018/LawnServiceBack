@@ -28,7 +28,12 @@ async function ensureDefaults() {
 function toPublicSrc(src, req) {
   if (!src) return src;
   if (!src.startsWith('/uploads/')) return src;
-  return `${req.protocol}://${req.get('host')}${src}`;
+
+  const forwardedProtoHeader = req.get('x-forwarded-proto') || '';
+  const forwardedProto = forwardedProtoHeader.split(',')[0].trim();
+  const protocol = forwardedProto || req.protocol || 'https';
+
+  return `${protocol}://${req.get('host')}${src}`;
 }
 
 function normalizeRow(row, req) {
