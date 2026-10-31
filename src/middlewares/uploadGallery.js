@@ -54,7 +54,8 @@ const uploadGallery = multer({
   storage,
   fileFilter: imageFileFilter,
   limits: {
-    fileSize: 8 * 1024 * 1024,
+    // 25MB: cubre fotos de iPhone en calidad máxima y RAW de Android
+    fileSize: 25 * 1024 * 1024,
   },
 });
 

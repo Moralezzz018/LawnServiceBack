@@ -1,6 +1,17 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../sequelize');
 
+// Categorías vinculadas a los servicios reales del negocio
+const GALLERY_CATEGORIES = [
+  'general',
+  'lawn',
+  'trimming',
+  'plants',
+  'mulching',
+  'flowers',
+  'cleanup',
+];
+
 const GalleryImage = sequelize.define(
   'GalleryImage',
   {
@@ -26,6 +37,14 @@ const GalleryImage = sequelize.define(
         min: 1,
       },
     },
+    category: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: 'general',
+      validate: {
+        isIn: [GALLERY_CATEGORIES],
+      },
+    },
   },
   {
     tableName: 'gallery_images',
@@ -34,3 +53,4 @@ const GalleryImage = sequelize.define(
 );
 
 module.exports = GalleryImage;
+module.exports.GALLERY_CATEGORIES = GALLERY_CATEGORIES;
