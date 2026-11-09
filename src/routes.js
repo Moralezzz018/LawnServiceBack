@@ -4,6 +4,7 @@ const appointmentsRoutes = require('./modules/appointments/appointments.routes')
 const quotesRoutes = require('./modules/quotes/quotes.routes');
 const servicePricesRoutes = require('./modules/service-prices/service-prices.routes');
 const galleryRoutes = require('./modules/gallery/gallery.routes');
+const testimonialsRoutes = require('./modules/testimonials/testimonials.routes');
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/appointments', appointmentsRoutes);
 router.use('/quotes', quotesRoutes);
 router.use('/service-prices', servicePricesRoutes);
 router.use('/gallery', galleryRoutes);
+router.use('/testimonials', testimonialsRoutes);
 
 module.exports = router;
