@@ -21,8 +21,17 @@ const GalleryImage = sequelize.define(
       autoIncrement: true,
     },
     src: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
+    },
+    imageData: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    mimeType: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+      defaultValue: 'image/jpeg',
     },
     alt: {
       type: DataTypes.STRING,

@@ -47,6 +47,13 @@ const defaultTestimonials = [
 async function ensureDefaults() {
   await Testimonial.sync({ alter: true });
 
+  // Auto-aprobar cualquier testimonio previo para que se muestre inmediatamente
+  try {
+    await Testimonial.update({ approved: true }, { where: { approved: false } });
+  } catch (updateErr) {
+    console.warn('[ENSURE_DEFAULTS] Warning updating testimonials:', updateErr.message);
+  }
+
   const count = await Testimonial.count();
   if (count > 0) return;
 
@@ -79,6 +86,9 @@ async function listTestimonials(req, res, next) {
  */
 async function createTestimonial(req, res, next) {
   try {
+    // Garantizamos que la tabla exista antes de insertar
+    await ensureDefaults();
+
     const { name, location, service, text, rating } = req.body;
 
     const row = await Testimonial.create({
@@ -87,11 +97,11 @@ async function createTestimonial(req, res, next) {
       service: service.trim(),
       text: text.trim(),
       rating: Number(rating) || 5,
-      approved: false, // Requiere aprobación del admin
+      approved: true, // Se publica inmediatamente
     });
 
     return res.status(201).json({
-      message: 'Testimonial submitted successfully. It will appear after review.',
+      message: 'Testimonial submitted and published successfully!',
       data: {
         id: row.id,
         name: row.name,

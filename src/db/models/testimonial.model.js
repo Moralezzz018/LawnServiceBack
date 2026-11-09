@@ -53,7 +53,7 @@ const Testimonial = sequelize.define(
     approved: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // requieren aprobación del admin antes de mostrarse
+      defaultValue: true, // Visible inmediatamente en el sitio público
     },
   },
   {
